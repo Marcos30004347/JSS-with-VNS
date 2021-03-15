@@ -119,7 +119,7 @@ void pipe_neighborhood_change_step(solution* x, solution* y, int* k) {
     }
 }
 
-void skewed_neighborhood_change_step(solution* x, solution* y, int* k, float (*f)(solution*), float a) {
+void skewed_neighborhood_change_step(solution* x, solution* y, int* k, float a) {
     if(f(y) - f(x) < a*d(y,x)) {
         solution_assign(x, y);  // x <- y
         *k = 1;

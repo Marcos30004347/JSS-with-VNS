@@ -5,6 +5,7 @@
 //*******************
 typedef struct job {
     // TODO
+    long cost;
 } job;
 
 
@@ -13,8 +14,11 @@ typedef struct job {
 //*******************
 typedef struct solution {
     job* jobs;
-    unsigned* permutation;
-    unsigned count;
+    unsigned jobs_count;
+    unsigned machines_count;
+    unsigned** permutation;
+    unsigned* machine_jobs_count;
+
 } solution;
 
 void solution_free(solution* x) {
@@ -24,12 +28,22 @@ void solution_free(solution* x) {
 
 solution* solution_copy(solution* x) {
     solution* y = (solution*)malloc(sizeof(solution));
-    y->jobs = x->jobs;
-    y->count = x->count;
-	for (int it = 0; it < x->count; it++)
-        y->permutation[it] = x->permutation[it];
 
-    return x;
+    y->jobs = x->jobs;
+    y->jobs_count = x->jobs_count;
+    y->machines_count = x->machines_count;
+
+    y->permutation = (unsigned**)malloc(sizeof(unsigned*)*x->machines_count);
+	
+    for (int it = 0; it < x->machines_count; it++) {
+        y->permutation[it] = (unsigned*)malloc(sizeof(unsigned)*x->jobs_count);
+        y->machine_jobs_count[it] = x->machine_jobs_count[it];
+        for (int jt = 0; jt < x->machine_jobs_count[it]; jt++) {
+            y->permutation[it][jt] = x->permutation[it][jt];
+        }
+    }
+
+    return y;
 }
 
 void solution_assign(solution* to, solution* from) {
@@ -52,9 +66,16 @@ long d(solution* x, solution* y) {
 
 // Cost function
 long f(solution* x) {
-    // TODO
-    exit(EXIT_FAILURE);
-    return 0;
+    long max = 0;
+    for(int i=0; i<x->machines_count; i++) {
+        long curr = 0;
+        for(int j=0; j<x->machine_jobs_count[i]; i++) {
+            curr += x->permutation[i][j];
+            if(curr >= max) max = curr;
+        }
+    }
+
+    return max;
 }
 
 
@@ -159,7 +180,7 @@ solution* local_search_first_improvement(solution* x, long p) {
 
         do {
             i = i+1;
-            
+
             // xi is the N[i] equivalent of the neighborhood structure N
             xi = shaking(x);
             
@@ -168,6 +189,7 @@ solution* local_search_first_improvement(solution* x, long p) {
                 solution_free(xi);
                 break;
             }
+
             solution_free(xi);
         } while(i != p);
     } while(f(y) > f(x));
@@ -175,6 +197,7 @@ solution* local_search_first_improvement(solution* x, long p) {
     return y;
 }
 
+// N = {x0,x1,...,xk};
 solution* local_search_best_improvement(solution* x, long p) {
     // Neighborhood structire are being generated randomly in the
     // shaking method

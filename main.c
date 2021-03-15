@@ -248,14 +248,12 @@ solution* basic_variable_neighborhood_search(solution* x, long kmax) {
         k = 1;
         while(k < kmax) {
             solution* y = shaking(x);
-            
+
+            // can also be first improvement
             solution* yy = local_search_best_improvement(y, 10);
-            // solution* yy = local_search_first_improvement(y, 10);
-            
+        
+            // can also be any of the neighborhood_change_step algorithms, I beleave
             sequential_neighborhood_change_step(x, yy, &k);
-            // cyclic_neighborhood_change_step(x, yy, &l);
-            // pipe_neighborhood_change_step(x, yy, &l);
-            // skewed_neighborhood_change_step(x, yy, &l);
 
             solution_free(y);
             solution_free(yy);
@@ -280,7 +278,6 @@ solution* general_variable_neighborhood_search(solution* x, long kmax) {
         while(k < kmax) {
             solution* y = shaking(x);
             
-            // can also be first improvement
             solution* yy = vnd_best_improvement(y, 5, 10);
             
             // can also be any of the neighborhood_change_step algorithms, I beleave

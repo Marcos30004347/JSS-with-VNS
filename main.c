@@ -5,10 +5,6 @@ typedef struct job {
 } job;
 
 typedef struct solution {
-
-} solution;
-
-typedef struct solution {
     job* jobs;
     unsigned* permutation;
     unsigned count;

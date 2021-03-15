@@ -1,9 +1,16 @@
 #include <stdlib.h>
 
+//*******************
+// Job
+//*******************
 typedef struct job {
     // TODO
 } job;
 
+
+//*******************
+// Solution
+//*******************
 typedef struct solution {
     job* jobs;
     unsigned* permutation;
@@ -15,12 +22,35 @@ void solution_free(solution* x) {
     free(x);
 }
 
+solution* solution_copy(solution* x) {
+    solution* y = (solution*)malloc(sizeof(solution));
+    y->jobs = x->jobs;
+    y->count = x->count;
+	for (int it = 0; it < x->count; it++)
+        y->permutation[it] = x->permutation[it];
+
+    return x;
+}
+
+void solution_assign(solution* to, solution* from) {
+    if(to != NULL)
+        solution_free(to);
+    to = solution_copy(from);
+}
+
+//**********************************
+//* Functions
+//*********************************
+
+// Distance function, it measures the distance of two solutions
+// using (Euclidian, cost diference)? distance
 long d(solution* x, solution* y) {
     // TODO
     exit(EXIT_FAILURE);
     return 0;
 }
 
+// Cost function
 long f(solution* x) {
     // TODO
     exit(EXIT_FAILURE);
@@ -58,22 +88,7 @@ solution* shaking(solution* x) {
     return y;
 }
 
-solution* solution_copy(solution* x) {
-    solution* y = (solution*)malloc(sizeof(solution));
-    y->jobs = x->jobs;
-    y->count = x->count;
-	for (int it = 0; it < x->count; it++)
-        y->permutation[it] = x->permutation[it];
 
-    return x;
-}
-
-
-void solution_assign(solution* to, solution* from) {
-    if(to != NULL)
-        solution_free(to);
-    to = solution_copy(from);
-}
 
 solution* argmin(solution* x, long p) {
     solution* y = solution_copy(x);

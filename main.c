@@ -1,24 +1,11 @@
 #include <stdlib.h>
 
 //*******************
-// Job
-//*******************
-typedef struct job {
-    // TODO
-    long cost;
-} job;
-
-
-//*******************
 // Solution
 //*******************
 typedef struct solution {
-    job* jobs;
-    unsigned jobs_count;
-    unsigned machines_count;
-    unsigned** permutation;
-    unsigned* machine_jobs_count;
-
+    unsigned count;
+    unsigned* permutation;
 } solution;
 
 void solution_free(solution* x) {
@@ -28,20 +15,11 @@ void solution_free(solution* x) {
 
 solution* solution_copy(solution* x) {
     solution* y = (solution*)malloc(sizeof(solution));
+    y->count = x->count;
+    y->permutation = (unsigned*)malloc(x->count*sizeof(unsigned));
 
-    y->jobs = x->jobs;
-    y->jobs_count = x->jobs_count;
-    y->machines_count = x->machines_count;
-
-    y->permutation = (unsigned**)malloc(sizeof(unsigned*)*x->machines_count);
-	
-    for (int it = 0; it < x->machines_count; it++) {
-        y->permutation[it] = (unsigned*)malloc(sizeof(unsigned)*x->jobs_count);
-        y->machine_jobs_count[it] = x->machine_jobs_count[it];
-        for (int jt = 0; jt < x->machine_jobs_count[it]; jt++) {
-            y->permutation[it][jt] = x->permutation[it][jt];
-        }
-    }
+	for (int it = 0; it < x->count; it++)
+        y->permutation[it] = x->permutation[it];
 
     return y;
 }
@@ -66,16 +44,9 @@ long d(solution* x, solution* y) {
 
 // Cost function
 long f(solution* x) {
-    long max = 0;
-    for(int i=0; i<x->machines_count; i++) {
-        long curr = 0;
-        for(int j=0; j<x->machine_jobs_count[i]; i++) {
-            curr += x->permutation[i][j];
-            if(curr >= max) max = curr;
-        }
-    }
-
-    return max;
+    // TODO
+    exit(EXIT_FAILURE);
+    return 0;
 }
 
 
@@ -94,7 +65,6 @@ solution* shaking(solution* x) {
     int it;
 
     solution* y = (solution*)malloc(sizeof(solution));
-    y->jobs = x->jobs;
     y->count = x->count;
 
 	for (it = 0; it < pos1; i++)

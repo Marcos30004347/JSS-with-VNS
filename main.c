@@ -1,12 +1,47 @@
 #include <stdlib.h>
+#include <string.h>
+
+// //*******************
+// // Job
+// //*******************
+// typedef struct job {
+//     unsigned* task;
+//     unsigned n;
+// } job;
+
+unsigned** costs;
+unsigned jobs_count;
+unsigned machines_count;
 
 //*******************
 // Solution
 //*******************
 typedef struct solution {
-    unsigned count;
+    // job* jobs;
+
+    // [ 1,2,2,3,1,2,3,3,1 ]
     unsigned* permutation;
 } solution;
+
+long total_cost(solution* x) {
+    unsigned* pos_tracker = (unsigned*)malloc(sizeof(unsigned)*jobs_count);
+    memset(pos_tracker, 0, jobs_count);
+
+    unsigned total = 0;
+
+    for(int i=0; i<jobs_count*machines_count; i++) {
+        unsigned job = x->permutation[i];
+        unsigned machine = pos_tracker[job];
+        
+        total += costs[job][machine];
+        pos_tracker[job]++;
+    }
+
+    free(pos_tracker);
+
+    return total;
+}
+
 
 void solution_free(solution* x) {
     free(x->permutation);
@@ -15,10 +50,10 @@ void solution_free(solution* x) {
 
 solution* solution_copy(solution* x) {
     solution* y = (solution*)malloc(sizeof(solution));
-    y->count = x->count;
-    y->permutation = (unsigned*)malloc(x->count*sizeof(unsigned));
 
-	for (int it = 0; it < x->count; it++)
+    y->permutation = (unsigned*)malloc(jobs_count*sizeof(unsigned));
+
+	for (int it = 0; it < jobs_count; it++)
         y->permutation[it] = x->permutation[it];
 
     return y;
@@ -43,33 +78,27 @@ long d(solution* x, solution* y) {
 }
 
 // Cost function
-long f(solution* x) {
-    // TODO
-    exit(EXIT_FAILURE);
-    return 0;
-}
 
 
 // Shaking creates a new neighbohr by taking a random permutation
 // from the current solution.
 // choose x' ∈ Nk(x) at random and return x';
 solution* shaking(solution* x) {
-    int count = x->count;
-	int pos1 = 1 + rand() % (x->count / 4);
-	int pos2 = pos1 + 1 + rand() % (x->count / 4);
-	int pos3 = pos2 + 1 + rand() % (x->count / 4);
+    int jobs_count = jobs_count;
+	int pos1 = 1 + rand() % (jobs_count / 4);
+	int pos2 = pos1 + 1 + rand() % (jobs_count / 4);
+	int pos3 = pos2 + 1 + rand() % (jobs_count / 4);
 
 	int i;
 
-    unsigned tmp[x->count];
+    unsigned tmp[jobs_count];
     int it;
 
     solution* y = (solution*)malloc(sizeof(solution));
-    y->count = x->count;
 
 	for (it = 0; it < pos1; i++)
         y->permutation[it++] = x->permutation[it];
-	for (it = pos3; it < count; it++)
+	for (it = pos3; it < jobs_count; it++)
         y->permutation[it++] = x->permutation[it];
 	for (it = pos2; it < pos3; it++)
         y->permutation[it++] = x->permutation[it];
@@ -97,7 +126,7 @@ solution* argmin(solution* x, long p) {
 // ************************************
 
 void sequential_neighborhood_change_step(solution* x, solution* y, int* k) {
-    if(f(y) < f(x)) {
+    if(total_cost(y) < total_cost(x)) {
         solution_assign(x, y); // x <- y
         *k = 1;
     } else {
@@ -105,16 +134,21 @@ void sequential_neighborhood_change_step(solution* x, solution* y, int* k) {
     }
 }
 
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
 void cyclic_neighborhood_change_step(solution* x, solution* y, int* k) {
     *k = *k + 1;
 
-    if(f(y) < f(x)) {
+    if(total_cost(y) < total_cost(x)) {
         solution_assign(x, y);  // x <- y
     }
 }
 
 void pipe_neighborhood_change_step(solution* x, solution* y, int* k) {
-    if(f(y) < f(x)) {
+    if(total_cost(y) < total_cost(x)) {
         solution_assign(x, y);  // x <- y
     } else {
         *k = *k + 1;
@@ -122,13 +156,18 @@ void pipe_neighborhood_change_step(solution* x, solution* y, int* k) {
 }
 
 void skewed_neighborhood_change_step(solution* x, solution* y, int* k, float a) {
-    if(f(y) - f(x) < a*d(y,x)) {
+    if(total_cost(y) - total_cost(x) < a*d(y,x)) {
         solution_assign(x, y);  // x <- y
         *k = 1;
     } else {
         *k = *k + 1;
     }
 }
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
+// TODO VER SE VAMO USAR =========================
 
 // ************************************
 // 2.3 Improvement procedures within VNS
@@ -242,7 +281,7 @@ void mixed_vnd_best_improvement(solution* x, long lmax, long p) {
 solution* basic_variable_neighborhood_search(solution* x, long kmax) {
 	int max_iterations = 5;
 
-	int count = 0, it = 0;
+	int jobs_count = 0, it = 0;
     long k = 0;
     long it = 0;
 
@@ -271,7 +310,7 @@ solution* basic_variable_neighborhood_search(solution* x, long kmax) {
 solution* general_variable_neighborhood_search(solution* x, long kmax) {
 	int max_iterations = 5;
 
-	int count = 0, it = 0;
+	int jobs_count = 0, it = 0;
     long k = 0;
     long it = 0;
 

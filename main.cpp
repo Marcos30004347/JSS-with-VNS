@@ -26,8 +26,8 @@ ostream& operator<<(ostream& os, const op& it) {
 
 vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
-unsigned n, m;
 
+unsigned n, m;
 unsigned k_max;
 unsigned it_max;
 unsigned N_size;
@@ -79,19 +79,23 @@ solution permutate(solution &s) {
   return s_;
 }
 
-solution shaking(solution s) {
+
+solution opt_2(solution s) {
   unsigned i = rand() % s.size();
   unsigned j = rand() % s.size();
   unsigned tmp = s[i];
+
   s[i] = s[j];
   s[j] = tmp;
+
   return s;
 }
+
 
 solution argmin(solution s, long p) {
   solution s_ = s;
   for(int i=0; i<p; i++) {
-    solution tmp = shaking(s);
+    solution tmp = opt_2(s);
     if(total_cost(tmp) < total_cost(s_))
       s_ = tmp;
   }
@@ -117,7 +121,6 @@ solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
       s_ = s;
       do {
         solution s__ = argmin(s, p);
-
         sequential_neighborhood_change_step(s, s__, l);
       } while(l != l_max);
   
@@ -134,7 +137,7 @@ solution general_vns(solution s) {
 	do {
     k = 1;
     while(k < k_max) {
-      solution s_ = shaking(s);
+      solution s_ = permutate(s);
       solution s__ = vnd_best_improvement(s_, N_size, k_max);
       sequential_neighborhood_change_step(s, s__, k);
     }

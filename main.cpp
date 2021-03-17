@@ -305,7 +305,6 @@ using namespace std;
 // }
 
 // 
-vector<vector<unsigned>> costs;
 
 struct op {
   unsigned machine;
@@ -322,27 +321,37 @@ ostream& operator<<(ostream& os, const op& it) {
     return os;
 }
 
+vector<vector<unsigned>> costs;
+vector<vector<op>> ops;
+
 int help(char *program) {
   cout << program << "<file>" << endl;
   return 0;
 }
 
-unsigned total_cost(solution* x) {
-    unsigned* pos_tracker = (unsigned*)malloc(sizeof(unsigned)*jobs_count);
-    memset(pos_tracker, 0, jobs_count);
+// [1,1,2,0,2,0]
+unsigned total_cost(solution s) {
+  vector<unsigned> positions(costs.size(), 0);
+  vector<unsigned> job_time(costs.size(), 0);
+  vector<unsigned> machine_time(costs[0].size(), 0);
 
-    unsigned total = 0;
+  for(unsigned j : s) {
+    unsigned o = positions[j];
+    unsigned m = ops[j][o].machine;
+    unsigned time = costs[j][m] + max(job_time[j], machine_time[m]);
+    job_time[j] = time;
+    machine_time[m] = time;
+    positions[j]++;
+    cout << "job_time: "; debugA(job_time, job_time.size());
+    cout << "machine_time: "; debugA(machine_time, machine_time.size());
+  }
 
-    for(int i=0; i<jobs_count*machines_count; i++) {
-        unsigned job = x->permutation[i];
-        unsigned machine = pos_tracker[job];
-        
-        total += costs[job][machine];
-        pos_tracker[job]++;
-    }
+  unsigned total = 0;
 
-    free(pos_tracker);
-    return total;
+  for(unsigned m : machine_time)
+    total = max(total, m);
+
+  return total;
 }
 
 int by_job(op &a, op &b) {
@@ -354,10 +363,10 @@ job sort_by (job j){
   return j;
 }
 
-vector<vector<unsigned>> build_cost_matrix(vector<job> &jobs) {
+vector<vector<unsigned>> build_cost_matrix(vector<job> &ops) {
   vector<vector<unsigned>> costs;
 
-  for(job j : jobs){
+  for(job j : ops){
     job j_sorted = sort_by(j);
     
     vector<unsigned> j_cost;
@@ -384,8 +393,6 @@ int main (int argc, char *argv[]) {
   unsigned n, m;
   file >> n >> m;
 
-  vector<vector<op>> jobs;
-
   for(unsigned i=0; i<n; i++) {
     vector<op> job;
 
@@ -395,11 +402,23 @@ int main (int argc, char *argv[]) {
       job.push_back(curr);
     }
 
-    jobs.push_back(job);
+    ops.push_back(job);
   }
 
-  costs = build_cost_matrix(jobs);
+  costs = build_cost_matrix(ops);
 
+  // solution s;
+  // for (int j=0; j<n; j++)
+  //   for (int i=0; i<m; i++)
+  //     s.push_back(j);
+
+  solution s = {0, 1, 1, 0};
+
+  unsigned total = total_cost(s);
+
+  debugA(s, s.size());
+
+  debug(total);
 
   file.close();
   return 0;

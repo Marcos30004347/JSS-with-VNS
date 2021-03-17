@@ -16,18 +16,18 @@ struct op {
   friend ostream& operator<<(ostream& os, const op& it);
 };
 
-using job = vector<op>;
-using solution = vector<unsigned>;
-using Neighborhood = vector<solution>;
-
 ostream& operator<<(ostream& os, const op& it) {
     os << "(" << it.machine << ", " << it.cost << ")";
     return os;
 }
 
+using job = vector<op>;
+using solution = vector<unsigned>;
+using Neighborhood = vector<solution>;
+
+
 vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
-
 unsigned n, m;
 unsigned k_max;
 unsigned it_max;
@@ -69,17 +69,16 @@ solution permutate(solution &s) {
   solution s_;
 
 	for (i = 0; i < pos1; i++)
-        s_.push_back(s[i]);
+    s_.push_back(s[i]);
 	for (i = pos3; i < size; i++)
-        s_.push_back(s[i]);
+    s_.push_back(s[i]);
 	for (i = pos2; i < pos3; i++)
-        s_.push_back(s[i]);
+    s_.push_back(s[i]);
 	for (i = pos1; i < pos2; i++)
-        s_.push_back(s[i]);
+    s_.push_back(s[i]);
 
   return s_;
 }
-
 
 solution opt2(solution s) {
   unsigned i = rand() % s.size();
@@ -92,9 +91,9 @@ solution opt2(solution s) {
   return s;
 }
 
-
 Neighborhood neighborhood(solution& s, unsigned p) {
   Neighborhood n;
+
   for(int i=0; i<p; i++)
     n.push_back(opt2(s));
 
@@ -103,10 +102,12 @@ Neighborhood neighborhood(solution& s, unsigned p) {
 
 solution argmin(solution s, Neighborhood ns) {
   solution s_ = s;
+
   for(int i=0; i<ns.size(); i++) {
     if(total_cost(ns[i]) < total_cost(s_))
       s_ = ns[i];
   }
+
   return s_;
 }
 

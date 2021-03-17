@@ -1,4 +1,4 @@
-[
+{"instances" : [
   {
     "name" : "abz5",
     "jobs" : 10,
@@ -1340,3 +1340,4 @@
     "path" : "instances/ta80"
   }
 ]
+}

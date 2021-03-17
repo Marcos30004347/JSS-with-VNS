@@ -18,6 +18,7 @@ struct op {
 
 using job = vector<op>;
 using solution = vector<unsigned>;
+using Neighborhood = vector<solution>;
 
 ostream& operator<<(ostream& os, const op& it) {
     os << "(" << it.machine << ", " << it.cost << ")";
@@ -80,7 +81,7 @@ solution permutate(solution &s) {
 }
 
 
-solution opt_2(solution s) {
+solution opt2(solution s) {
   unsigned i = rand() % s.size();
   unsigned j = rand() % s.size();
   unsigned tmp = s[i];
@@ -92,12 +93,19 @@ solution opt_2(solution s) {
 }
 
 
-solution argmin(solution s, long p) {
+Neighborhood neighborhood(solution& s, unsigned p) {
+  Neighborhood n;
+  for(int i=0; i<p; i++)
+    n.push_back(opt2(s));
+
+  return n;
+}
+
+solution argmin(solution s, Neighborhood ns) {
   solution s_ = s;
-  for(int i=0; i<p; i++) {
-    solution tmp = opt_2(s);
-    if(total_cost(tmp) < total_cost(s_))
-      s_ = tmp;
+  for(int i=0; i<ns.size(); i++) {
+    if(total_cost(ns[i]) < total_cost(s_))
+      s_ = ns[i];
   }
   return s_;
 }
@@ -119,8 +127,10 @@ solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
       stop = false;
       l = 1;
       s_ = s;
+
       do {
-        solution s__ = argmin(s, p);
+        Neighborhood N_l = neighborhood(s, p);
+        solution s__ = argmin(s, N_l);
         sequential_neighborhood_change_step(s, s__, l);
       } while(l != l_max);
   

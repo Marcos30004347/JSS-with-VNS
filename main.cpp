@@ -213,7 +213,7 @@ int main (int argc, char *argv[]) {
 
   solution vns = general_vns(s);
 
-  debug(total_cost(vns));
+  cout << total_cost(vns) << endl;
 
   file.close();
   return 0;

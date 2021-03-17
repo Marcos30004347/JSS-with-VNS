@@ -28,8 +28,12 @@ vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
 unsigned n, m;
 
+unsigned k_max;
+unsigned it_max;
+unsigned N_size;
+
 int help(char *program) {
-  cout << program << "<file>" << endl;
+  cout << program << "<file> <it_max> <k_max> <N_max>" << endl;
   return 0;
 }
 
@@ -124,20 +128,18 @@ solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
     return s_;
 }
 
-solution general_vns(solution s, unsigned k_max) {
-	unsigned max_it = 5, it = 0, k = 0;
+solution general_vns(solution s) {
+	unsigned it = 0, k = 0;
 
 	do {
     k = 1;
     while(k < k_max) {
       solution s_ = shaking(s);
-      
-      solution s__ = vnd_best_improvement(s_, 5, 10);
-      
+      solution s__ = vnd_best_improvement(s_, N_size, k_max);
       sequential_neighborhood_change_step(s, s__, k);
     }
     it++;
-	} while (it < max_it);
+	} while (it < it_max);
   
   return s;
 }
@@ -169,7 +171,7 @@ vector<vector<unsigned>> build_cost_matrix(vector<job> &ops) {
 
 int main (int argc, char *argv[]) {
 
-  if (argc < 2)
+  if (argc < 5)
     return help(argv[0]);
 
   srand(time(nullptr));
@@ -177,11 +179,14 @@ int main (int argc, char *argv[]) {
   ifstream file(argv[1]);
   string line;
   
+  it_max = atoi(argv[2]);
+  k_max = atoi(argv[3]);
+  N_size = atoi(argv[4]);
+  
   for(unsigned i=0; i<4; i++)
     getline(file, line);
 
   file >> n >> m;
-
   for(unsigned i=0; i<n; i++) {
     vector<op> job;
 
@@ -203,11 +208,8 @@ int main (int argc, char *argv[]) {
   
   s = permutate(s);
 
-  debug(total_cost(s));
+  solution vns = general_vns(s);
 
-  solution vns = general_vns(s, 5);
-
-  debugA(vns, vns.size());
   debug(total_cost(vns));
 
   file.close();

@@ -1,310 +1,13 @@
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <random>
+#include <ctime>
 
 #include "debug.hpp"
 
 using namespace std;
-
-// //*******************
-// // Solution
-// //*******************
-
-// void solution_free(solution* x) {
-//     free(x->permutation);
-//     free(x);
-// }
-
-// solution* solution_copy(solution* x) {
-//     solution* y = (solution*)malloc(sizeof(solution));
-
-//     y->permutation = (unsigned*)malloc(jobs_count*sizeof(unsigned));
-
-// 	for (int it = 0; it < jobs_count; it++)
-//         y->permutation[it] = x->permutation[it];
-
-//     return y;
-// }
-
-// void solution_assign(solution* to, solution* from) {
-//     if(to != NULL)
-//         solution_free(to);
-//     to = solution_copy(from);
-// }
-
-// //**********************************
-// //* Functions
-// //*********************************
-
-// // Distance function, it measures the distance of two solutions
-// // using (Euclidian, cost diference)? distance
-// long d(solution* x, solution* y) {
-//     // TODO
-//     exit(EXIT_FAILURE);
-//     return 0;
-// }
-
-// // Cost function
-
-
-// // Shaking creates a new neighbohr by taking a random permutation
-// // from the current solution.
-// // choose x' ∈ Nk(x) at random and return x';
-// solution* shaking(solution* x) {
-//     int jobs_count = jobs_count;
-// 	int pos1 = 1 + rand() % (jobs_count / 4);
-// 	int pos2 = pos1 + 1 + rand() % (jobs_count / 4);
-// 	int pos3 = pos2 + 1 + rand() % (jobs_count / 4);
-
-// 	int i;
-
-//     unsigned tmp[jobs_count];
-//     int it;
-
-//     solution* y = (solution*)malloc(sizeof(solution));
-
-// 	for (it = 0; it < pos1; i++)
-//         y->permutation[it++] = x->permutation[it];
-// 	for (it = pos3; it < jobs_count; it++)
-//         y->permutation[it++] = x->permutation[it];
-// 	for (it = pos2; it < pos3; it++)
-//         y->permutation[it++] = x->permutation[it];
-// 	for (it = pos1; it < pos2; it++)
-//         y->permutation[it++] = x->permutation[it];
-
-//     return y;
-// }
-
-
-
-// solution* argmin(solution* x, long p) {
-//     solution* y = solution_copy(x);
-//     for(int i=0; i<p; i++) {
-//         solution* tmp = shaking(x);
-//         if(f(tmp) < f(y))
-//             solution_assign(y, tmp);
-//         solution_free(tmp);
-//     }
-//     return y;
-// }
-
-// // ************************************
-// // 2.2 Neightborhood change step
-// // ************************************
-
-// void sequential_neighborhood_change_step(solution* x, solution* y, int* k) {
-//     if(total_cost(y) < total_cost(x)) {
-//         solution_assign(x, y); // x <- y
-//         *k = 1;
-//     } else {
-//         *k = *k + 1;
-//     }
-// }
-
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// void cyclic_neighborhood_change_step(solution* x, solution* y, int* k) {
-//     *k = *k + 1;
-
-//     if(total_cost(y) < total_cost(x)) {
-//         solution_assign(x, y);  // x <- y
-//     }
-// }
-
-// void pipe_neighborhood_change_step(solution* x, solution* y, int* k) {
-//     if(total_cost(y) < total_cost(x)) {
-//         solution_assign(x, y);  // x <- y
-//     } else {
-//         *k = *k + 1;
-//     }
-// }
-
-// void skewed_neighborhood_change_step(solution* x, solution* y, int* k, float a) {
-//     if(total_cost(y) - total_cost(x) < a*d(y,x)) {
-//         solution_assign(x, y);  // x <- y
-//         *k = 1;
-//     } else {
-//         *k = *k + 1;
-//     }
-// }
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-// // TODO VER SE VAMO USAR =========================
-
-// // ************************************
-// // 2.3 Improvement procedures within VNS
-// // ************************************
-
-// // *** IMPORTANT
-// // *** -> Note that a metaheuristic can also be used as a local search for example Simulated Annealing, Tabu Search, Iterated local search, GRASP, Genetic algorithm, etc
-
-// solution* local_search_first_improvement(solution* x, long p) {
-//     // Neighborhood structire are being generated randomly in the
-//     // shaking method
-
-//     solution* xi = NULL;
-//     solution* y = NULL;
-
-//     do {
-//         int i = 0;
-//         y = solution_copy(x);
-
-//         do {
-//             i = i+1;
-
-//             // xi is the N[i] equivalent of the neighborhood structure N
-//             xi = shaking(x);
-            
-//             if(f(xi) < f(x)) {
-//                 x = solution_copy(xi);
-//                 solution_free(xi);
-//                 break;
-//             }
-
-//             solution_free(xi);
-//         } while(i != p);
-//     } while(f(y) > f(x));
-    
-//     return y;
-// }
-
-// // N = {x0,x1,...,xk};
-// solution* local_search_best_improvement(solution* x, long p) {
-//     // Neighborhood structire are being generated randomly in the
-//     // shaking method
-
-//     solution* y = NULL;
-
-//     do {
-//         y = solution_copy(x);
-
-//         solution* min_neighborhood = argmin(x, p);
-//         solution_assign(x, min_neighborhood);
-//         solution_free(min_neighborhood);
-//     } while(f(y) > f(x));
-
-//     return y;
-// }
-
-
-// // ***********************************************
-// // 2.3.2 Variable neighborhood descent procedures
-// // ***********************************************
-
-// solution* vnd_best_improvement(solution* x, long lmax, long p) {
-//     int stop, l;
-//     solution* y = NULL;
-
-//     do {
-//         stop = 0;
-//         l = 1;
-//         solution_assign(y, x);
-//         do {
-//             solution* yy;
-
-//             // argmin is the cause for the best improvement
-//             solution* min_neighborhood = argmin(x, p);
-//             solution_assign(yy, min_neighborhood);
-//             solution_free(min_neighborhood);
-
-//             // All the following algorithms can be used!
-        
-//             sequential_neighborhood_change_step(x, yy, &l);
-//             // cyclic_neighborhood_change_step(x, yy, &l);
-//             // pipe_neighborhood_change_step(x, yy, &l);
-//             // skewed_neighborhood_change_step(x, yy, &l);
-//         } while(l != lmax);
-    
-//         if(f(y) <= f(x)) {
-//             stop = 1;
-//         }
-    
-//     } while(!stop);
-//     return y;
-// }
-
-// // Algorithm 9 of VNS-survey
-// void nested_vnd_best_improvement(solution* x, long lmax, long p) {
-//     // TODO
-//     exit(EXIT_FAILURE);
-// }
-
-// // Algorithm 10 of VNS-survey
-// void mixed_vnd_best_improvement(solution* x, long lmax, long p) {
-//     // TODO
-//     exit(EXIT_FAILURE);
-// }
-
-
-// // ****************************************
-// // 3 Variable neighborhood search variants
-// // ****************************************
-
-// solution* basic_variable_neighborhood_search(solution* x, long kmax) {
-// 	int max_iterations = 5;
-
-// 	int jobs_count = 0, it = 0;
-//     long k = 0;
-//     long it = 0;
-
-// 	do 
-// 	{
-//         it++;
-//         k = 1;
-//         while(k < kmax) {
-//             solution* y = shaking(x);
-
-//             // can also be first improvement
-//             solution* yy = local_search_best_improvement(y, 10);
-        
-//             // can also be any of the neighborhood_change_step algorithms, I beleave
-//             sequential_neighborhood_change_step(x, yy, &k);
-
-//             solution_free(y);
-//             solution_free(yy);
-//         }
-
-// 	} while (it < max_iterations);
-//     return x;
-// }
-
-
-// solution* general_variable_neighborhood_search(solution* x, long kmax) {
-// 	int max_iterations = 5;
-
-// 	int jobs_count = 0, it = 0;
-//     long k = 0;
-//     long it = 0;
-
-// 	do 
-// 	{
-//         it++;
-//         k = 1;
-//         while(k < kmax) {
-//             solution* y = shaking(x);
-            
-//             solution* yy = vnd_best_improvement(y, 5, 10);
-            
-//             // can also be any of the neighborhood_change_step algorithms, I beleave
-//             sequential_neighborhood_change_step(x, yy, &k);
-
-//             solution_free(y);
-//             solution_free(yy);
-//         }
-
-// 	} while (it < max_iterations);
-//     return x;
-// }
-
-// 
 
 struct op {
   unsigned machine;
@@ -323,13 +26,13 @@ ostream& operator<<(ostream& os, const op& it) {
 
 vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
+unsigned n, m;
 
 int help(char *program) {
   cout << program << "<file>" << endl;
   return 0;
 }
 
-// [1,1,2,0,2,0]
 unsigned total_cost(solution s) {
   vector<unsigned> positions(costs.size(), 0);
   vector<unsigned> job_time(costs.size(), 0);
@@ -342,16 +45,101 @@ unsigned total_cost(solution s) {
     job_time[j] = time;
     machine_time[m] = time;
     positions[j]++;
-    cout << "job_time: "; debugA(job_time, job_time.size());
-    cout << "machine_time: "; debugA(machine_time, machine_time.size());
   }
 
   unsigned total = 0;
-
   for(unsigned m : machine_time)
     total = max(total, m);
 
   return total;
+}
+
+solution permutate(solution &s) {
+  unsigned size = s.size();
+	int pos1 = 1 + rand() % (size / 4);
+	int pos2 = pos1 + 1 + rand() % (size / 4);
+	int pos3 = pos2 + 1 + rand() % (size / 4);
+
+	int i;
+  solution s_;
+
+	for (i = 0; i < pos1; i++)
+        s_.push_back(s[i]);
+	for (i = pos3; i < size; i++)
+        s_.push_back(s[i]);
+	for (i = pos2; i < pos3; i++)
+        s_.push_back(s[i]);
+	for (i = pos1; i < pos2; i++)
+        s_.push_back(s[i]);
+
+  return s_;
+}
+
+solution shaking(solution s) {
+  unsigned i = rand() % s.size();
+  unsigned j = rand() % s.size();
+  unsigned tmp = s[i];
+  s[i] = s[j];
+  s[j] = tmp;
+  return s;
+}
+
+solution argmin(solution s, long p) {
+  solution s_ = s;
+  for(int i=0; i<p; i++) {
+    solution tmp = shaking(s);
+    if(total_cost(tmp) < total_cost(s_))
+      s_ = tmp;
+  }
+  return s_;
+}
+
+void sequential_neighborhood_change_step(solution &s, solution &s_, unsigned &k) {
+  if(total_cost(s_) < total_cost(s)) {
+    s = s_;
+    k = 1;
+  } else
+    k = k + 1;
+}
+
+solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
+    unsigned l;
+    bool stop;
+    solution s_;
+
+    do {
+      stop = false;
+      l = 1;
+      s_ = s;
+      do {
+        solution s__ = argmin(s, p);
+
+        sequential_neighborhood_change_step(s, s__, l);
+      } while(l != l_max);
+  
+      if(total_cost(s_) <= total_cost(s))
+        stop = true;
+    
+    } while(!stop);
+    return s_;
+}
+
+solution general_vns(solution s, unsigned k_max) {
+	unsigned max_it = 5, it = 0, k = 0;
+
+	do {
+    k = 1;
+    while(k < k_max) {
+      solution s_ = shaking(s);
+      
+      solution s__ = vnd_best_improvement(s_, 5, 10);
+      
+      sequential_neighborhood_change_step(s, s__, k);
+    }
+    it++;
+	} while (it < max_it);
+  
+  return s;
 }
 
 int by_job(op &a, op &b) {
@@ -384,13 +172,14 @@ int main (int argc, char *argv[]) {
   if (argc < 2)
     return help(argv[0]);
 
+  srand(time(nullptr));
+
   ifstream file(argv[1]);
   string line;
   
   for(unsigned i=0; i<4; i++)
     getline(file, line);
 
-  unsigned n, m;
   file >> n >> m;
 
   for(unsigned i=0; i<n; i++) {
@@ -407,18 +196,19 @@ int main (int argc, char *argv[]) {
 
   costs = build_cost_matrix(ops);
 
-  // solution s;
-  // for (int j=0; j<n; j++)
-  //   for (int i=0; i<m; i++)
-  //     s.push_back(j);
+  solution s;
+  for (int j=0; j<n; j++)
+    for (int i=0; i<m; i++)
+      s.push_back(j);
+  
+  s = permutate(s);
 
-  solution s = {0, 1, 1, 0};
+  debug(total_cost(s));
 
-  unsigned total = total_cost(s);
+  solution vns = general_vns(s, 5);
 
-  debugA(s, s.size());
-
-  debug(total);
+  debugA(vns, vns.size());
+  debug(total_cost(vns));
 
   file.close();
   return 0;

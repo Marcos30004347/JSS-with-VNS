@@ -1,3 +1,4 @@
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -6,6 +7,8 @@
 #include <ctime>
 
 #include "debug.hpp"
+
+#define NEIGHBORHOOD_SIZE 15
 
 using namespace std;
 
@@ -16,25 +19,23 @@ struct op {
   friend ostream& operator<<(ostream& os, const op& it);
 };
 
+using job = vector<op>;
+using solution = vector<unsigned>;
+
 ostream& operator<<(ostream& os, const op& it) {
     os << "(" << it.machine << ", " << it.cost << ")";
     return os;
 }
 
-using job = vector<op>;
-using solution = vector<unsigned>;
-using N = vector<solution>;
-
-
 vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
+
 unsigned n, m;
 unsigned it_max;
-unsigned k_max = 2;
-unsigned l_max = 2;
+
 
 int help(char *program) {
-  cout << program << " <file> <it_max>" << endl;
+  cout << program << "<file> <it_max>" << endl;
   return 0;
 }
 
@@ -80,7 +81,7 @@ solution permutate(solution &s) {
   return s_;
 }
 
-solution opt2(solution s) {
+solution opt_2(solution s) {
   unsigned i = rand() % s.size();
   unsigned j = rand() % s.size();
   unsigned tmp = s[i];
@@ -91,8 +92,7 @@ solution opt2(solution s) {
   return s;
 }
 
-
-solution opt3(solution s) {
+solution opt_3(solution s) {
 	int i = 1 + rand() % (s.size() / 3);
 	int j = i + 1 + rand() % (s.size() / 3);
 	int k = j + 1 + rand() % (s.size() / 3);
@@ -141,26 +141,21 @@ solution opt3(solution s) {
   return s;
 }
 
-solution shake(solution& s, unsigned& k) {
-  switch (k) {
-  case 1:
-    return opt2(s);
-  case 2:
-    return opt3(s);
-  default:
-    return s;
-  }
-}
 
-solution argmin(solution s, unsigned l) {
-  solution s_;
+solution argmin(solution s, unsigned& k, unsigned p) {
+  solution s_ = s;
+  for(int i=0; i<p; i++) {
+    solution tmp;
 
-  do {
-    cout << "ABC: " << total_cost(s_) << " " << total_cost(s) << endl;
-    s_ = shake(s, l);
+    switch (k) {
+    case 1: tmp = opt_2(s); break;
+    case 2: tmp = opt_3(s); break;
+    default: break;
+    }
+
+    if(total_cost(tmp) < total_cost(s_))
+      s_ = tmp;
   }
-  while(total_cost(s_) >= total_cost(s));
-  debugLine();
 
   return s_;
 }
@@ -173,7 +168,7 @@ void sequential_neighborhood_change_step(solution &s, solution &s_, unsigned &k)
     k = k + 1;
 }
 
-solution vnd_first_improvement(solution &s, unsigned l_max) {
+solution vnd_best_improvement(solution &s, unsigned l_max, unsigned& k, unsigned p) {
     unsigned l;
     bool stop;
     solution s_;
@@ -182,9 +177,8 @@ solution vnd_first_improvement(solution &s, unsigned l_max) {
       stop = false;
       l = 1;
       s_ = s;
-
       do {
-        solution s__ = argmin(s, l);
+        solution s__ = argmin(s, k, p);
         sequential_neighborhood_change_step(s, s__, l);
       } while(l != l_max);
   
@@ -197,15 +191,17 @@ solution vnd_first_improvement(solution &s, unsigned l_max) {
 
 solution general_vns(solution s) {
 	unsigned it = 0, k = 0;
+  ///TODO tirar daqui
+  unsigned k_max = 2;
+  unsigned l_max = 2;
 
 	do {
     k = 1;
     while(k <= k_max) {
-      solution s_ = shake(s, k_max);
-      solution s__ = vnd_first_improvement(s_, l_max);
+      solution s_ = permutate(s);
+      solution s__ = vnd_best_improvement(s_, l_max, k, NEIGHBORHOOD_SIZE);
       sequential_neighborhood_change_step(s, s__, k);
     }
-
     it++;
 	} while (it < it_max);
   
@@ -239,7 +235,7 @@ vector<vector<unsigned>> build_cost_matrix(vector<job> &ops) {
 
 int main (int argc, char *argv[]) {
 
-  if (argc < 3)
+  if (argc < 1)
     return help(argv[0]);
 
   srand(time(nullptr));
@@ -276,7 +272,7 @@ int main (int argc, char *argv[]) {
 
   solution vns = general_vns(s);
 
-  debug(total_cost(vns));
+  cout << total_cost(vns) << endl;
 
   file.close();
   return 0;

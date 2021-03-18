@@ -1,3 +1,5 @@
+# !/bin/python3
+
 import json
 import subprocess
 import sys
@@ -11,7 +13,7 @@ cmd = "make"
 subprocess.call(cmd)
 
 for case in data["instances"]:
-    subprocess.call(["./jss", case["path"], "15", "15", "15"])
+    subprocess.call(["./jss", case["path"], "15"])
 
 r = open("out.txt")
 r.readline()

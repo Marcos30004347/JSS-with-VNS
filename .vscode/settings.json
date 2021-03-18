@@ -2,6 +2,7 @@
     "files.associations": {
         "vector": "cpp",
         "deque": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "iosfwd": "cpp"
     }
 }

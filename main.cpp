@@ -29,12 +29,12 @@ using N = vector<solution>;
 vector<vector<unsigned>> costs;
 vector<vector<op>> ops;
 unsigned n, m;
-unsigned k_max;
 unsigned it_max;
-unsigned N_size;
+unsigned k_max = 2;
+unsigned l_max = 2;
 
 int help(char *program) {
-  cout << program << "<file> <it_max> <k_max> <N_max>" << endl;
+  cout << program << " <file> <it_max>" << endl;
   return 0;
 }
 
@@ -141,9 +141,8 @@ solution opt3(solution s) {
   return s;
 }
 
-solution shake(solution& s, unsigned p, unsigned& k) {
-  switch (k)
-  {
+solution shake(solution& s, unsigned& k) {
+  switch (k) {
   case 1:
     return opt2(s);
   case 2:
@@ -153,14 +152,15 @@ solution shake(solution& s, unsigned p, unsigned& k) {
   }
 }
 
-solution argmin(solution s, unsigned p, unsigned k) {
-  solution s_ = s;
+solution argmin(solution s, unsigned l) {
+  solution s_;
 
-  for(int i=0; i<p; i++) {
-    solution tmp = shake(s, p, k);
-    if(total_cost(tmp) < total_cost(s_))
-      s_ = tmp;
+  do {
+    cout << "ABC: " << total_cost(s_) << " " << total_cost(s) << endl;
+    s_ = shake(s, l);
   }
+  while(total_cost(s_) >= total_cost(s));
+  debugLine();
 
   return s_;
 }
@@ -173,7 +173,7 @@ void sequential_neighborhood_change_step(solution &s, solution &s_, unsigned &k)
     k = k + 1;
 }
 
-solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
+solution vnd_first_improvement(solution &s, unsigned l_max) {
     unsigned l;
     bool stop;
     solution s_;
@@ -184,7 +184,7 @@ solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
       s_ = s;
 
       do {
-        solution s__ = argmin(s, p, l);
+        solution s__ = argmin(s, l);
         sequential_neighborhood_change_step(s, s__, l);
       } while(l != l_max);
   
@@ -200,9 +200,9 @@ solution general_vns(solution s) {
 
 	do {
     k = 1;
-    while(k < k_max) {
-      solution s_ = shake(s, k_max, N_size);
-      solution s__ = vnd_best_improvement(s_, N_size, k_max);
+    while(k <= k_max) {
+      solution s_ = shake(s, k_max);
+      solution s__ = vnd_first_improvement(s_, l_max);
       sequential_neighborhood_change_step(s, s__, k);
     }
 
@@ -239,7 +239,7 @@ vector<vector<unsigned>> build_cost_matrix(vector<job> &ops) {
 
 int main (int argc, char *argv[]) {
 
-  if (argc < 5)
+  if (argc < 3)
     return help(argv[0]);
 
   srand(time(nullptr));
@@ -248,8 +248,6 @@ int main (int argc, char *argv[]) {
   string line;
   
   it_max = atoi(argv[2]);
-  k_max = 2;
-  N_size = atoi(argv[4]);
   
   for(unsigned i=0; i<4; i++)
     getline(file, line);

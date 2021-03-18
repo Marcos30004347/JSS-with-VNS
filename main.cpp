@@ -23,7 +23,7 @@ ostream& operator<<(ostream& os, const op& it) {
 
 using job = vector<op>;
 using solution = vector<unsigned>;
-using Neighborhood = vector<solution>;
+using N = vector<solution>;
 
 
 vector<vector<unsigned>> costs;
@@ -91,21 +91,75 @@ solution opt2(solution s) {
   return s;
 }
 
-Neighborhood neighborhood(solution& s, unsigned p) {
-  Neighborhood n;
 
-  for(int i=0; i<p; i++)
-    n.push_back(opt2(s));
+solution opt3(solution s) {
+	int i = 1 + rand() % (s.size() / 3);
+	int j = i + 1 + rand() % (s.size() / 3);
+	int k = j + 1 + rand() % (s.size() / 3);
 
-  return n;
+  unsigned tmp0 = s[i];
+  unsigned tmp1 = s[j];
+  unsigned tmp2 = s[k];
+
+  solution tmp = s;
+
+  tmp[i] = tmp0;
+  tmp[j] = tmp2;
+  tmp[k] = tmp1;
+  if(total_cost(tmp) < total_cost(s)) {
+    s = tmp;
+  }
+
+  tmp[i] = tmp2;
+  tmp[j] = tmp1;
+  tmp[k] = tmp0;
+  if(total_cost(tmp) < total_cost(s)) {
+    s = tmp;
+  }
+
+  tmp[i] = tmp1;
+  tmp[j] = tmp0;
+  tmp[k] = tmp2;
+  if(total_cost(tmp) < total_cost(s)) {
+    s = tmp;
+  }
+
+  tmp[i] = tmp2;
+  tmp[j] = tmp0;
+  tmp[k] = tmp1;
+  if(total_cost(tmp) < total_cost(s)) {
+    s = tmp;
+  }
+
+  tmp[i] = tmp2;
+  tmp[j] = tmp1;
+  tmp[k] = tmp0;
+  if(total_cost(tmp) < total_cost(s)) {
+    s = tmp;
+  }
+
+  return s;
 }
 
-solution argmin(solution s, Neighborhood ns) {
+solution shake(solution& s, unsigned p, unsigned& k) {
+  switch (k)
+  {
+  case 1:
+    return opt2(s);
+  case 2:
+    return opt3(s);
+  default:
+    return s;
+  }
+}
+
+solution argmin(solution s, unsigned p, unsigned k) {
   solution s_ = s;
 
-  for(int i=0; i<ns.size(); i++) {
-    if(total_cost(ns[i]) < total_cost(s_))
-      s_ = ns[i];
+  for(int i=0; i<p; i++) {
+    solution tmp = shake(s, p, k);
+    if(total_cost(tmp) < total_cost(s_))
+      s_ = tmp;
   }
 
   return s_;
@@ -130,8 +184,7 @@ solution vnd_best_improvement(solution &s, unsigned l_max, unsigned p) {
       s_ = s;
 
       do {
-        Neighborhood N_l = neighborhood(s, p);
-        solution s__ = argmin(s, N_l);
+        solution s__ = argmin(s, p, l);
         sequential_neighborhood_change_step(s, s__, l);
       } while(l != l_max);
   
@@ -148,10 +201,11 @@ solution general_vns(solution s) {
 	do {
     k = 1;
     while(k < k_max) {
-      solution s_ = permutate(s);
+      solution s_ = shake(s, k_max, N_size);
       solution s__ = vnd_best_improvement(s_, N_size, k_max);
       sequential_neighborhood_change_step(s, s__, k);
     }
+
     it++;
 	} while (it < it_max);
   
@@ -194,7 +248,7 @@ int main (int argc, char *argv[]) {
   string line;
   
   it_max = atoi(argv[2]);
-  k_max = atoi(argv[3]);
+  k_max = 2;
   N_size = atoi(argv[4]);
   
   for(unsigned i=0; i<4; i++)
@@ -224,7 +278,7 @@ int main (int argc, char *argv[]) {
 
   solution vns = general_vns(s);
 
-  cout << total_cost(vns) << endl;
+  debug(total_cost(vns));
 
   file.close();
   return 0;

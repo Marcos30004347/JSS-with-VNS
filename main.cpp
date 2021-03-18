@@ -35,7 +35,7 @@ unsigned it_max;
 
 
 int help(char *program) {
-  cout << program << "<file> <it_max>" << endl;
+  cout << program << " <file> <it_max>" << endl;
   return 0;
 }
 
@@ -235,7 +235,7 @@ vector<vector<unsigned>> build_cost_matrix(vector<job> &ops) {
 
 int main (int argc, char *argv[]) {
 
-  if (argc < 1)
+  if (argc < 3)
     return help(argv[0]);
 
   srand(time(nullptr));
